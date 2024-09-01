@@ -60,7 +60,7 @@ class ConversationAI:
 
         self.callbackHandler = AsyncStreamingSlackCallbackHandler(self.slack_client)
 
-        llm2 = ChatOpenAI(model_name=self.model_name, temperature=self.model_temperature, request_timeout=60,
+        llm1 = ChatOpenAI(model_name=self.model_name, temperature=self.model_temperature, request_timeout=60,
                           max_retries=3, streaming=True, verbose=True)
 
         llm2 = ChatOpenAI(model_name=self.model_name, temperature=self.model_temperature, request_timeout=60,
