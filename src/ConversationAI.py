@@ -69,7 +69,7 @@ class ConversationAI:
 
         ### Construct retriever ###
         loader = WebBaseLoader(
-            web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",),
+            web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/","https://www.techjapan.work/"),
             bs_kwargs=dict(
                 parse_only=bs4.SoupStrainer(
                     class_=("post-content", "post-title", "post-header")
