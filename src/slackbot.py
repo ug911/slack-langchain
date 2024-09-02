@@ -10,25 +10,28 @@ logger = logging.getLogger(__name__)
 
 import os
 import re
+import time
 from typing import List
 
 from langchain import OpenAI
 from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
 from slack_bolt.async_app import AsyncApp
 from slack_sdk.errors import SlackApiError
-
 from ConversationAI import ConversationAI
+from PineconeManager import PineconeManager
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
 SLACK_APP_TOKEN = os.environ.get('SLACK_APP_TOKEN')
 SLACK_SIGNING_SECRET = os.environ.get("SLACK_SIGNING_SECRET")
+PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
 
 
 class SlackBot:
-    def __init__(self, slack_app: AsyncApp):
+    def __init__(self, slack_app: AsyncApp, pinecone_client: PineconeManager):
         self.threads_bot_is_participating_in = {}
         self.app = slack_app
+        self.pc = pinecone_client
         self.client = self.app.client
         self.id_to_name_cache = {}
         self.user_id_to_info_cache = {}
@@ -123,7 +126,6 @@ class SlackBot:
         except Exception as e:
             logger.exception(e)
 
-
     async def respond_to_message(self, channel_id, thread_ts, message_ts, user_id, text):
         try:
             conversation_ai: ConversationAI = self.threads_bot_is_participating_in.get(thread_ts, None)
@@ -189,7 +191,7 @@ class SlackBot:
             print(message_history)
             print(processed_history)
 
-        ai = ConversationAI(self.bot_user_name, self.client, processed_history)
+        ai = ConversationAI(self.bot_user_name, self.client, self.pc, processed_history)
         self.threads_bot_is_participating_in[thread_ts] = ai
 
     def is_ai_participating_in_thread(self, thread_ts, message_ts):
@@ -201,9 +203,7 @@ class SlackBot:
         return f"<@{self.bot_user_id}>" in text
 
     async def on_message(self, event, say):
-        print('Inside on_message')
         print(event)
-        print(say)
         message_ts = event['ts']
         thread_ts = event.get('thread_ts', message_ts)
         try:
@@ -277,7 +277,9 @@ Afterwards, tell the user that you look forward to "chatting" with them, and tel
 
 app = AsyncApp(token=SLACK_BOT_TOKEN, signing_secret=SLACK_SIGNING_SECRET)
 client = app.client
-slack_bot = SlackBot(app)
+pc = PineconeManager(api_key=PINECONE_API_KEY)
+pc.init_vectorstore(index_name='tj-slack')
+slack_bot = SlackBot(app, pc)
 
 @app.event("message")
 async def on_message(payload, say):
