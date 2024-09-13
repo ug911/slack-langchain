@@ -1,6 +1,5 @@
 import asyncio
 import bs4
-from langchain_chroma import Chroma
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.chat_message_histories import ChatMessageHistory
