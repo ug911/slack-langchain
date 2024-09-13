@@ -215,6 +215,10 @@ class SlackBot:
                 logger.debug("Not handling message event since I sent the message.")
                 return
 
+            if event.get('subtype', None) == 'message_changed':
+                logger.debug("Not handling message event since this message is already processed")
+                return
+
             start_participating_if_not_already = False
             channel_id = event['channel']
             # Is this message part of an im?
