@@ -281,7 +281,7 @@ Afterwards, tell the user that you look forward to "chatting" with them, and tel
 
 app = AsyncApp(token=SLACK_BOT_TOKEN, signing_secret=SLACK_SIGNING_SECRET)
 client = app.client
-pc = PineconeManager(api_key=PINECONE_API_KEY)
+pc = PineconeManager(api_key=PINECONE_API_KEY, namespace='salesmom')
 pc.init_vectorstore(index_name='tj-slack-sales')
 slack_bot = SlackBot(app, pc)
 

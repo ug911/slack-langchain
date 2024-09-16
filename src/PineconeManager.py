@@ -4,7 +4,7 @@ from langchain_pinecone import PineconeVectorStore
 from langchain_openai import OpenAIEmbeddings
 
 class PineconeManager:
-    def __init__(self, api_key, environment="us-east-1", embedding_dimension=1536):
+    def __init__(self, api_key, environment="us-east-1", embedding_dimension=1536, namespace=None):
         """
         Initializes the PineconeManager with API key and environment.
 
@@ -17,6 +17,7 @@ class PineconeManager:
         self.environment = environment
         self.index = None
         self.vectorstore = None
+        self.namespace = namespace
 
     def create_or_initialise_index(self, index_name):
         """
@@ -52,7 +53,10 @@ class PineconeManager:
             self.create_or_initialise_index(index_name=index_name)
 
         embeddings = OpenAIEmbeddings()
-        self.vectorstore = PineconeVectorStore(index=self.index, embedding=embeddings)
+        if self.namespace:
+            self.vectorstore = PineconeVectorStore(index=self.index, embedding=embeddings, namespace=self.namespace)
+        else:
+            self.vectorstore = PineconeVectorStore(index=self.index, embedding=embeddings)
         print(f"Vectorstore defined for index '{index_name}'.")
 
     def add_documents(self, documents, namespace=None):

@@ -68,8 +68,10 @@ class ConversationAI:
         # vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
         # retriever = vectorstore.as_retriever()
 
-        retriever = self.pc.vectorstore.as_retriever()
-
+        retriever = self.pc.vectorstore.as_retriever(
+            search_type="mmr",
+            search_kwargs={'k': 1, 'fetch_k': 10}
+        )
         ### Contextualize question ###
         contextualize_q_system_prompt = """Given a chat history and the latest user question \
         which might reference context in the chat history, formulate a standalone question \
@@ -88,10 +90,13 @@ class ConversationAI:
 
         ### Answer question ###
         qa_system_prompt = """You are an assistant made by engineers at Tech Japan (also Talendly). \
-        you are supposed to send latest updates from documents which primarily has meeting notes and context about clients. \
+        You are supposed to send latest updates from documents which primarily has meeting notes and context about clients. \
+        When asked about a company, do not give information about any other company even if it is in context. \
+        Ignore any other company apart from the company being asked upon and do not talk about it. \
+        If you are not confident about answer, respond politely that you do not know the answer. \
         Do not hallucinate and make up facts. \
         You have a delightful & helpful persona. You are never to abuse to talk bad about anyone or tech japan. \
-        Refrain from talkin about comeptitors. \
+        Refrain from talking about competitors. \
 
         {context}"""
         qa_prompt = ChatPromptTemplate.from_messages(
