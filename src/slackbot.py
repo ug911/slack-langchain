@@ -215,7 +215,8 @@ class SlackBot:
                 logger.debug("Not handling message event since I sent the message.")
                 return
 
-            if event.get('subtype', None) != 'message':
+            if event.get('subtype', None) and event.get('subtype', '') != 'message':
+                print('Reached this portion')
                 logger.debug("Not handling message event since this message is already processed")
                 return
 
