@@ -69,8 +69,8 @@ class ConversationAI:
         # retriever = vectorstore.as_retriever()
 
         retriever = self.pc.vectorstore.as_retriever(
-            search_type="mmr",
-            search_kwargs={'k': 1, 'fetch_k': 10}
+            # search_type="mmr",
+            # search_kwargs={'k': 1, 'fetch_k': 10}
         )
         ### Contextualize question ###
         contextualize_q_system_prompt = """Given a chat history and the latest user question \
