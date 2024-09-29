@@ -12,7 +12,7 @@ from pathlib import Path
 
 # Get the folder this file is in:
 this_file_folder = os.path.dirname(os.path.realpath(__file__))
-load_dotenv(Path(this_file_folder) / ".env")
+load_dotenv(Path(this_file_folder) / "bot_envs/.env_sales")
 
 from src.slackbot import slack_bot
 
