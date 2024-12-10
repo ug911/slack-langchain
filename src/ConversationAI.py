@@ -38,15 +38,19 @@ class ConversationAI:
         self.lock = asyncio.Lock()
 
     async def create_rag_agent(self, sender_user_info, initial_message):
-        print('Inside create_rag_agent')
-        self.model_name = DEFAULT_MODEL
-        self.model_temperature = DEFAULT_TEMPERATURE
+        logger.info('Creating RAG agent')
+        self.model_name = self.model_name or DEFAULT_MODEL
+        self.model_temperature = self.model_temperature or DEFAULT_TEMPERATURE
         # llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
         self.callbackHandler = AsyncStreamingSlackCallbackHandler(self.slack_client)
 
-        llm1 = ChatOpenAI(model_name=self.model_name, temperature=self.model_temperature, request_timeout=60,
-                          max_retries=3, streaming=True, verbose=True)
+        try:
+            llm1 = ChatOpenAI(model_name=self.model_name, temperature=self.model_temperature, request_timeout=60,
+                              max_retries=3, streaming=True, verbose=True)
+        except Exception as e:
+            logger.error(f"Failed to create LLM instances: {e}")
+            return None
 
         llm2 = ChatOpenAI(model_name=self.model_name, temperature=self.model_temperature, request_timeout=60,
                          max_retries=3, streaming=True, verbose=True,
@@ -109,9 +113,9 @@ class ConversationAI:
         store = {}
 
         def get_session_history(session_id: str) -> BaseChatMessageHistory:
-            print('Here with {}'.format(session_id))
+            logger.info('Retrieving session history for {}'.format(session_id))
             if session_id not in store:
-                print('Not found with {}'.format(session_id))
+                logger.info('Session not found: {}'.format(session_id))
                 store[session_id] = ChatMessageHistory()
                 existing_thread_history = self.existing_thread_history
                 if existing_thread_history is not None:
@@ -122,7 +126,7 @@ class ConversationAI:
                             store[session_id].add_ai_message(message_content)
                         else:
                             store[session_id].add_user_message(message_content)
-            print(store[session_id])
+            logger.debug(f"Session history: {store[session_id]}")
             print('-----------------------')
             return store[session_id]
 
