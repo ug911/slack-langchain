@@ -110,7 +110,7 @@ class SlackBot:
                 logger.exception(e)
             return
         else:
-            await self.client.chat_postMessage(channel=channel_id, text=response, thread_ts=thread_ts)
+            await self.client.chat_postMessage(channel=channel_id, text=response, thread_ts=thread_ts, mrkdwn=True)
 
     async def confirm_message_received(self, channel, thread_ts, message_ts, user_id_of_sender):
         # React to the message with a thinking face emoji:
@@ -283,7 +283,7 @@ Afterwards, tell the user that you look forward to "chatting" with them, and tel
 app = AsyncApp(token=SLACK_BOT_TOKEN, signing_secret=SLACK_SIGNING_SECRET)
 client = app.client
 pc = PineconeManager(api_key=PINECONE_API_KEY)
-pc.init_vectorstore(index_name='tj-slack')
+pc.init_vectorstore(index_name='dg-takano')
 slack_bot = SlackBot(app, pc)
 
 @app.event("message")
